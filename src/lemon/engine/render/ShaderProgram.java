@@ -35,11 +35,17 @@ public class ShaderProgram implements Listener {
 				GL20.glDeleteShader(shader.getId());
 			}
 		}
+		EventManager.INSTANCE.registerListener(this);
+	}
+	//Returns false if program did not validate, and prints out err info
+	public boolean validate() {
 		GL20.glValidateProgram(id);
 		if(GL20.glGetProgrami(id, GL20.GL_VALIDATE_STATUS)==GL11.GL_FALSE){
-			throw new IllegalArgumentException("Shader Program Validation Fail: "+GL20.glGetShaderInfoLog(id));
+			System.out.println("Failure: " + GL20.glGetProgramInfoLog(id));
+			return false;
 		}
-		EventManager.INSTANCE.registerListener(this);
+		System.out.println("Success");
+		return true;
 	}
 	public UniformVariable getUniformVariable(String name){
 		return new UniformVariable(GL20.glGetUniformLocation(id, name), name);

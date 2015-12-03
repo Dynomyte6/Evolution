@@ -232,6 +232,8 @@ public enum Game implements Listener {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		//GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		
+		System.out.println("Validate render");
+		program.validate();
 		GL20.glUseProgram(program.getId());
 		
 		model.render();
