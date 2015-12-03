@@ -39,6 +39,10 @@ public enum Game implements Listener {
 	private Vector translation;
 	private Vector rotation;
 	
+	private Matrix modelMatrix;
+	private Matrix viewMatrix;
+	private Matrix projectionMatrix;
+	
 	private PlayerControls<Integer, Integer> controls;
 	
 	private RawModel model;
@@ -120,13 +124,15 @@ public enum Game implements Listener {
 		uniform_modelMatrix = program.getUniformVariable("modelMatrix");
 		uniform_viewMatrix = program.getUniformVariable("viewMatrix");
 		uniform_projectionMatrix = program.getUniformVariable("projectionMatrix");
-		GL20.glUseProgram(program.getId());
-		uniform_modelMatrix.loadMatrix(Matrix.getIdentity(4));
+		
 		translation = new Vector(0f, 10f, 0f);
 		rotation = new Vector(0f, 0f, 0f);
-		uniform_viewMatrix.loadMatrix(MathUtil.getRotationX(rotation.getX()).multiply(MathUtil.getRotationY(rotation.getY()).multiply(MathUtil.getRotationZ(rotation.getZ()))));
-		uniform_projectionMatrix.loadMatrix(MathUtil.getPerspective(60f, MathUtil.getAspectRatio(event.getWindow()), 0.01f, 100f));
-		GL20.glUseProgram(0);
+		
+		modelMatrix = Matrix.getIdentity(4);
+		//FIXME: Optimize below line to identity matrix
+		viewMatrix = MathUtil.getRotationX(rotation.getX()).multiply(MathUtil.getRotationY(rotation.getY()).multiply(MathUtil.getRotationZ(rotation.getZ())));
+		projectionMatrix = MathUtil.getPerspective(60f, MathUtil.getAspectRatio(event.getWindow()), 0.01f, 100f);
+		
 		updateViewMatrix();
 		
 		controls = new PlayerControls<Integer, Integer>();
@@ -215,14 +221,12 @@ public enum Game implements Listener {
 		updateViewMatrix();
 	}
 	public void updateViewMatrix(){
-		GL20.glUseProgram(program.getId());
 		Vector translation = this.translation.invert();
 		Vector rotation = this.rotation.invert();
 		
 		Matrix translationMatrix = MathUtil.getTranslation(translation);
 		Matrix rotationMatrix = MathUtil.getRotationX(rotation.getX()).multiply(MathUtil.getRotationY(rotation.getY()).multiply(MathUtil.getRotationZ(rotation.getZ())));
-		uniform_viewMatrix.loadMatrix(rotationMatrix.multiply(translationMatrix));
-		GL20.glUseProgram(0);
+		viewMatrix = rotationMatrix.multiply(translationMatrix);
 	}
 	@Subscribe
 	public void render(RenderEvent event){
@@ -237,6 +241,10 @@ public enum Game implements Listener {
 		System.out.println("Validate render");
 		program.validate();
 		GL20.glUseProgram(program.getId());
+		
+		uniform_modelMatrix.loadMatrix(modelMatrix);
+		uniform_viewMatrix.loadMatrix(viewMatrix);
+		uniform_projectionMatrix.loadMatrix(projectionMatrix);
 		
 		model.render();
 		
