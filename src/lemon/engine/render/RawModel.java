@@ -32,14 +32,22 @@ public class RawModel {
 		GL30.glBindVertexArray(0);
 	}
 	public void render(){
-		GL30.glBindVertexArray(vao.getId());
-		for(int i: attributes){
-			GL20.glEnableVertexAttribArray(i);
-		}
+		//See prepare()
+		//GL30.glBindVertexArray(vao.getId());
+		//for(int i: attributes){
+		//	  GL20.glEnableVertexAttribArray(i);
+		//}
 		GL11.glDrawElements(GL11.GL_TRIANGLES, data.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		
 		for(int i: attributes){
 			GL20.glDisableVertexAttribArray(i);
 		}
 		GL30.glBindVertexArray(0);
+	}
+	public void prepare(){
+		GL30.glBindVertexArray(vao.getId());
+		for(int i: attributes){
+			GL20.glEnableVertexAttribArray(i);
+		}
 	}
 }
