@@ -14,6 +14,9 @@ public class Shader {
 		if(GL20.glGetShaderi(id, GL20.GL_COMPILE_STATUS)==GL11.GL_FALSE){
 			throw new IllegalStateException("Failed to Compile Shader: "+GL20.glGetShaderInfoLog(id));
 		}
+		else{
+			System.out.println("Compile success. Warnings: " + GL20.glGetShaderInfoLog(id));
+		}
 	}
 	public int getId(){
 		return id;
